@@ -598,10 +598,10 @@ class CakeController extends Controller
         //single post method
         public function singlePost($id){
             $single_post = Post::find($id);
-            $user_info = DB::table("users")->join("posts", "posts.user_id", "=", "users.id")->select("users.id", "users.name", "users.image")->get();
+            $user_infos = DB::table("users")->join("comments", "comments.user_id", "=", "users.id")->select("users.id", "users.name", "users.image")->get();
             $show_comments = Comment::all();
 
-            return view('single_post', compact("single_post", "user_info", "show_comments"));
+            return view('single_post', compact("single_post", "user_infos", "show_comments"));
         }
 
         //upload comment method
@@ -615,6 +615,13 @@ class CakeController extends Controller
                 return back();
                 
             }
+        }
+
+        //delete comment.
+        public function deleteComment($id){
+            $delete_comment = Comment::find($id);
+            $delete_comment->delete();            
+            return redirect()->back();
         }
 
 

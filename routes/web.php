@@ -91,6 +91,8 @@ use App\Http\Controllers\PaypalController;
         //user post delete
         Route::get('/dashboard/blog/delete/{id}',[CakeController::class, 'deletePost'])->name('delete.post');
 
+        //delete comment
+        Route::get('/delete_comment/{id}', [CakeController::class, "deleteComment"])->name('delete.comment');
 
 
         //coupon 

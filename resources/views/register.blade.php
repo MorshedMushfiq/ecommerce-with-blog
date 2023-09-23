@@ -15,16 +15,16 @@
                         @csrf
                         <div class="row">
                             <div class="col-lg-6">
-                                <input type="text" name='name' placeholder="Full Name" require>
+                                <input type="text" name='name' placeholder="Full Name" required>
                             </div>
                             <div class="col-lg-6">
-                                <input type="text" name='email' placeholder="E-mail" require>
+                                <input type="text" name='email' placeholder="E-mail" required>
                             </div>
                             <div class="col-lg-12">
-                                <input type="file" class='form-control' name='file' require>
+                                <input type="file" class='form-control' name='file' required>
                             </div>
                             <div class="col-lg-12">
-                                <input type="password" name='password' placeholder='Password' require>
+                                <input type="password" name='password' placeholder='Password' required>
                                 <button type="submit" class="site-btn">Register</button>
                             </div>
                         </div>

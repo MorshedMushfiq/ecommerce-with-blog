@@ -16,7 +16,7 @@
         <div class="col-md-12 border border-info">
             <div class="d-flex flex-column comment-section">
                 <div class="bg-white p-2">
-                    @foreach ($user_info->unique() as $user)
+                    @foreach ($user_infos->unique() as $user)
                     @if($single_post->user_id==$user->id)
                     <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{{URL::asset('uploads/profiles/'. $user->image)}}" width="40">
                         <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">{{$user->name}}</span><span class="date text-black-50">Shared publicly - {{$single_post->created_at}}</span></div>
@@ -29,19 +29,19 @@
                         <img class="img-fluid" src="{{URL::asset('uploads/posts/'.$single_post->post_image)}}">
                     </div>
                 </div>
+                <h2 class='text-success display-5'>All Comments</h2>
                 @foreach($show_comments as $all_comments)
                 @if($all_comments->post_id==$single_post->id)
                 <div class="comment">
+                    
                     <div class="d-flex flex-row justify-content-start align-items-start py-2">
-                        @foreach ($user_info->unique() as $user)
+                        @foreach ($user_infos->unique() as $user)
                         @if($all_comments->user_id==$user->id)
                         
                         <img class="rounded-circle" src="{{URL::asset('uploads/profiles/'.$user->image )}}" width="40">
-
-                        
                         
                         <div class="second py-2 px-2 mb-1"> <span class="text1">
-                            <div class="d-flex flex-column justify-content-start ml-2 mb-3"><span class="d-block font-weight-bold name">{{$user->name}}</span><span class="date text-black-50">Shared publicly - {{$single_post->created_at}}</span></div>
+                            <div class="d-flex flex-column justify-content-start ml-2 mb-3"><span class="d-block font-weight-bold name">{{$user->name}}</span><span class="date text-black-50">Shared publicly - {{$all_comments->created_at}}</span></div>
                             @endif
                             @endforeach
                             {{$all_comments->comment}}
@@ -49,7 +49,11 @@
                         </span>
                         </div>
                     </div>
+                 
+                    <a class='text-underline text-danger' href="{{route('delete.comment', $all_comments->id)}}">Delete comment</a>
+        
                 </div>
+
                 @endif
                 @endforeach 
                 <div class="bg-light p-2">
