@@ -64,16 +64,19 @@ class AdminController extends Controller
 
 
 
-
+    //admin main dashboard page
     public function index(){
         return view('admin.index');
     }
 
+
+    //admin products page
     public function productPage(){
         $all_products = Product::all();
         return view('admin.product', compact('all_products'));
     }
 
+    //admin upload product method
     public function upload(Request $request){
         //unique img name generation
         if($request->hasFile('image')){
@@ -175,11 +178,13 @@ class AdminController extends Controller
 
 
         // team functionality
+        //team page in dashboard
         public function teamPage(){
             $my_team = Team::all();
             return view('admin.team', compact('my_team'));
         }
     
+        //add new team member
         public function newTeamMember(Request $request){
             //unique img name generation
             if($request->hasFile('image')){
@@ -246,28 +251,28 @@ class AdminController extends Controller
             //return redirect()->back();
         }
     
-            //update team
-            public function updateTeam(Request $request){
-                //if(Session::get('type')=="Admin"){
-                //image unique name generation.
-                if($request->hasFile('image')){
-                    $img = $request->file('image');
-                    $unique_name = md5(time().rand().".". $img->getClientOriginalExtension());
-                    $img->move(public_path("uploads/teams"), $unique_name);
-                }
-        
-                $team = Team::find($request->id);
-                if(!empty($unique_name)){
-                    $team->image=$unique_name;
-                }
-                $team->name = $request->name;
-                $team->role = $request->role;
-                $team->cell = $request->cell;
-                $team->save();
-                return redirect()->back()->with("success", "Team Updated Successfull!!");
-                //}
-                //return redirect()->back();
+        //update team
+        public function updateTeam(Request $request){
+            //if(Session::get('type')=="Admin"){
+            //image unique name generation.
+            if($request->hasFile('image')){
+                $img = $request->file('image');
+                $unique_name = md5(time().rand().".". $img->getClientOriginalExtension());
+                $img->move(public_path("uploads/teams"), $unique_name);
             }
+    
+            $team = Team::find($request->id);
+            if(!empty($unique_name)){
+                $team->image=$unique_name;
+            }
+            $team->name = $request->name;
+            $team->role = $request->role;
+            $team->cell = $request->cell;
+            $team->save();
+            return redirect()->back()->with("success", "Team Updated Successfull!!");
+            //}
+            //return redirect()->back();
+        }
 
 
             

@@ -26,6 +26,8 @@ use Symfony\Component\HttpFoundation\Test\Constraint\ResponseIsRedirected;
 
 class CakeController extends Controller
 {
+
+    //for main page.
     public function index()
     {
         $blog = Post::all();
@@ -39,17 +41,19 @@ class CakeController extends Controller
 
 
 
-
+    //for about page
     public function about()
     {
         return view('about');
     }
 
+    //for menu page
     public function menu()
     {
         return view('menu');
     }
 
+    //for single product in cart
     public function productDetails($id)
     {
         $single_product = Product::find($id);
@@ -57,12 +61,14 @@ class CakeController extends Controller
     }
 
 
+    //for shopping cart
     public function shoppingCart()
     {
         $cartItems = DB::table("products")->join("carts", "carts.productId", "products.id")->select("products.title", "products.image", "products.category", "products.quantity as pQuantites", "products.price", "carts.*")->where("carts.customerId", Auth::user()->id)->get();
         return view("shopping_cart", compact("cartItems"));
     }
 
+    //add to cart method
     public function addCart(Request $request)
     {
         if (Auth::user()->id) {
@@ -78,6 +84,7 @@ class CakeController extends Controller
     }
 
 
+    //delete cart method
     public function deleteCart($id)
     {
         $cart_item = Cart::find($id);
@@ -86,6 +93,7 @@ class CakeController extends Controller
     }
 
 
+    //update cart method
     public function updateCart(Request $request)
     {
         if (Auth::user()->id) {
@@ -98,6 +106,7 @@ class CakeController extends Controller
         }
     }
 
+    //checkout proccess pending.
     public function checkout(Request $request)
     {
         if (Auth::user()->id) {
@@ -134,7 +143,7 @@ class CakeController extends Controller
 
 
 
-    //payment method stripe
+    //payment and check method using stripe
     public function paymentStripe(Request $request)
     {
         if (Auth::user()->id) {
@@ -215,28 +224,32 @@ class CakeController extends Controller
 
 
 
-
+    //for services page
     public function services()
     {
         return view('services');
     }
 
+    //for team page
     public function team()
     {
         return view('team');
     }
 
+    //for testimonial page
     public function testimonial()
     {
         return view('testimonial');
     }
 
+    //for contact page
     public function contact()
     {
         return view('contact');
     }
 
 
+    //for user profile page
     public function profile()
     {
         $user = User::find(Auth::user()->id);
@@ -269,11 +282,13 @@ class CakeController extends Controller
 
 
 
+    //for register page
     public function registerPage()
     {
         return view('register');
     }
 
+    //for login page
     public function loginPage()
     {
         return view('login');
@@ -306,6 +321,7 @@ class CakeController extends Controller
         $user->remember_token = time().rand();
         $user->save();
 
+        //user information array for sending in registermail.
         $user_info =[
             "id" => $user->id,
             "name" => $request->name,
@@ -316,7 +332,7 @@ class CakeController extends Controller
         ];
 
 
-
+        //send mail
         Mail::to($request->email)->send(new RegisterMail($user_info));
         return redirect()->route('cake.login')->with("success", "Congratulations $request->name, Your Account is ready, please verify your account via email");
     }
@@ -344,7 +360,7 @@ class CakeController extends Controller
 
 
 
-    //login any user.
+    //login any user with verification and restrictions.
     public function loginUser(Request $request)
     {
         //finding user email and password
@@ -436,6 +452,7 @@ class CakeController extends Controller
                 $find_user->save();
             }
 
+            //getting user information for sending mail
         $user_info =[
             "id" => $find_user->id,
             "name" => $find_user->name,
@@ -446,10 +463,11 @@ class CakeController extends Controller
         ];
 
 
+        //send mail
 
         Mail::to($user->email)->send(new RegisterMail($user_info));
 
-            
+            //restriction and verification
             $auth_status = $find_user->status;
              
             $auth_user_status = $find_user->user_status;
@@ -512,13 +530,13 @@ class CakeController extends Controller
     }
 
 
-
+    //blog page for the dashboard of a user
     public function blogPage(){
         $blog = Post::all();
         return view("admin.blog", compact('blog'));
     }
 
-
+    //upload blog method
     public function uploadBlog(Request $request){
         if(Auth::user()->id){
              //unique img name generation
@@ -542,7 +560,7 @@ class CakeController extends Controller
 
 
 
-            //update post
+        //update post
         public function updatePost(Request $request){
                 if(Auth::user()->id){
                 //image unique name generation.
@@ -577,7 +595,7 @@ class CakeController extends Controller
         }
 
 
-
+        //single post method
         public function singlePost($id){
             $single_post = Post::find($id);
             $user_info = DB::table("users")->join("posts", "posts.user_id", "=", "users.id")->select("users.id", "users.name", "users.image")->get();
@@ -586,6 +604,7 @@ class CakeController extends Controller
             return view('single_post', compact("single_post", "user_info", "show_comments"));
         }
 
+        //upload comment method
         public function postComment(Request $request){
             if(Auth::user()->id){
                 $comment = new Comment;
@@ -597,6 +616,10 @@ class CakeController extends Controller
                 
             }
         }
+
+
+
+        
 
 
 
