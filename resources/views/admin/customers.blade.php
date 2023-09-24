@@ -44,7 +44,7 @@
                           <td class="font-weight-medium"><div class="badge badge-success">{{$customer->created_at}}</div></td>
                           <td class="font-weight-medium"><div class="badge badge-info">{{$customer->status}}</div></td>
                           <td>
-                            @if($customer->user_status=="Active")
+                            @if($customer->status=="Active")
                             <a href="{{URL::to('/dashboard/our_customers/Block', $customer->id)}}" class='btn btn-danger btn-sm'>Block</a>
                             @else
                             <a href="{{URL::to('/dashboard/our_customers/Active', $customer->id)}}" class='btn btn-warning btn-sm'>Unblock</a>

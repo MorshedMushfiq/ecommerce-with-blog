@@ -598,7 +598,7 @@ class CakeController extends Controller
         //single post method
         public function singlePost($id){
             $single_post = Post::find($id);
-            $user_infos = DB::table("users")->join("comments", "comments.user_id", "=", "users.id")->select("users.id", "users.name", "users.image")->get();
+            $user_infos = DB::table("users")->join("comments", "comments.user_id", "=", "users.id")->select("users.id", "users.name", "users.image", "users.type")->get();
             $show_comments = Comment::all();
 
             return view('single_post', compact("single_post", "user_infos", "show_comments"));

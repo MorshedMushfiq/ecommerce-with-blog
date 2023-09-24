@@ -49,9 +49,9 @@
                         </span>
                         </div>
                     </div>
-                 
+                    @if($user->type=="Admin" &&$user->id==$all_comments->user_id)
                     <a class='text-underline text-danger' href="{{route('delete.comment', $all_comments->id)}}">Delete comment</a>
-        
+                    @endif
                 </div>
 
                 @endif
