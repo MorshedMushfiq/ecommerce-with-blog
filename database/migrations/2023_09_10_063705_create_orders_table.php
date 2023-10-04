@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string("fullname")->nullable();
             $table->string("address");
             $table->string("cell_number")->nullable();
-            $table->string("email");
+            $table->string("email")->nullable();
+            $table->string("session_id");
             $table->integer("customerId");
             $table->float("bill");
             $table->string("status");

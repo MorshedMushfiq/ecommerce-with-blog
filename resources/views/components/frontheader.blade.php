@@ -89,7 +89,7 @@
                         <a href="{{route('cake.testimonial')}}" id='testimonial' class="dropdown-item">Testimonial</a>
                         @auth
                         <a href="{{route('admin.dashboard')}}" id='testimonial' class="dropdown-item">My Profile</a>
-                        <a href="{{route('people.profile')}}" id='testimonial' class="dropdown-item">My Cart</a>
+                        <a href="{{route('shopping.cart')}}" id='testimonial' class="dropdown-item">My Cart</a>
                         <a href="{{route('cake.logout')}}" id='testimonial' class="dropdown-item">Log out</a>
                         @else 
                         <a href="{{route('cake.login')}}" id='testimonial' class="dropdown-item">Login</a>

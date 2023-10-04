@@ -212,7 +212,7 @@
 
 
 
-                    {{-- ssl payment gateway --}}
+                    {{-- paypal payment gateway --}}
 
               <!-- Button to Open the Modal -->
               <button type="button" class="btn btn-warning btn-sm my-2" data-toggle="modal" data-target="#sslmodel">

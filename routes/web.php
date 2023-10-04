@@ -134,20 +134,19 @@ Route::post('/checkout', [CakeController::class, 'checkout'])->name('check.out')
 
 //stripe checkout proccess
 Route::post('/payment-stripe', [CakeController::class, "paymentStripe"])->name('payment.stripe');
-// Route::post('/stripe-success', [CakeController::class, "successStripe"])->name('success.stripe');
-// Route::get('/stripe-cancel', [CakeController::class, "cancelStripe"])->name('cancel.stripe');
+Route::get('/success', [CakeController::class, "success"])->name('success');
+Route::get('/cancel', [CakeController::class, "cancel"])->name('cancel');
+Route::post('/webhook', [CakeController::class, "webhook"])->name('webhook');
 
 
 //paypal
-Route::post('/request-paypal',[PaypalController::class, 'requestPaypal'])->name('request.paypal');
+Route::post('/request-paypal', [PaypalController::class, 'requestPaypal'])->name('request.paypal');
 
 
 Route::get('/payment-success',[PaypalController::class, 'paymentSuccess'])->name('payment.success');
 
 
 Route::get('/payment-cancel',[PaypalController::class, 'paymentCancel'])->name('payment.cancel');
-
-
 
 
 

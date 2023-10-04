@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseIsRedirected;
 
 class CakeController extends Controller
@@ -64,8 +65,12 @@ class CakeController extends Controller
     //for shopping cart
     public function shoppingCart()
     {
-        $cartItems = DB::table("products")->join("carts", "carts.productId", "products.id")->select("products.title", "products.image", "products.category", "products.quantity as pQuantites", "products.price", "carts.*")->where("carts.customerId", Auth::user()->id)->get();
-        return view("shopping_cart", compact("cartItems"));
+        if(Auth::user()->id){
+            $cartItems = DB::table("products")->join("carts", "carts.productId", "products.id")->select("products.title", "products.image", "products.category", "products.quantity as pQuantites", "products.price", "carts.*")->where("carts.customerId", Auth::user()->id)->get();
+            return view("shopping_cart", compact("cartItems"));
+        }else{
+            return redirect()->route('cake.login');
+        }
     }
 
     //add to cart method
@@ -144,79 +149,155 @@ class CakeController extends Controller
 
 
     //payment and check method using stripe
-    public function paymentStripe(Request $request)
-    {
-        if (Auth::user()->id) {
-
-                    //payment system
-                    $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
-                    $checkout_session = $stripe->checkout->sessions->create([
-                        'line_items' => [[
-                            'price_data' => [
-                                'currency' => 'usd',
-
-                                'product_data' => [
-                                    'name' => "Cake",
-                                ],
-                                "unit_amount" => $request->bill * 100,
-                            ],
-                            "quantity" => 1,
-
-                        ]],
-                        'mode' => 'payment',
-                        'success_url' => route('shopping.cart'),
-                        'cancel_url' => route('shopping.cart'),
-                    ]);
-                    // dd($checkout_session);
-                    //mail information array
-                    // $payment_receipt = [
-                    //     "orderStatus" => "Paid",
-                    //     "CustomerId" => Auth::user()->id,
-                    //     "Bill" => $request->bill,
-                    //     "fullname" => $request->name,
-                    //     "cellNumber" => $request->cell,
-                    //     "email" => $request->email,
-                    //     "address" => $request->address,
-                    //     "cart" => $carts = Cart::where("customerId", Auth::user()->id)->get(),
-                    //     "products" => DB::table('carts')->join('products',"carts.productId", '=', 'products.id')->select("products.title", "products.description", "products.price"),
-                        
-                        
-                    // ];
-
-                    // Mail::to($request->email)->send(new OrderConfirmMail($payment_receipt));
-                    $order = new Order;
-                            $order->status = "Paid";
-                            $order->customerId = Auth::user()->id;
-                            $order->bill = $request->bill;
-                            $order->fullname = $request->name;
-                            $order->cell_number = $request->cell;
-                            $order->email = $request->email;
-                            $order->address = $request->address;
-                            if ($order->save()) {
-                                $carts = Cart::where("customerId", Auth::user()->id)->get();
-                
-                                foreach ($carts as $item) {
-                                    $products = Product::find($item->productId);
-                                    $orderItem = new OrderItem;
-                                    $orderItem->productId = $item->productId;
-                                    $orderItem->quantites = $item->quantites;
-                                    $orderItem->price = $products->price;
-                                    $orderItem->orderId = $order->id;
-                                    $orderItem->save();
-                                    $item->delete();
-                                }
-
-                    return redirect()->away($checkout_session->url)->with('success', 'payment success');
-
-
-                return redirect()->route('shopping.cart')->with("success", "Your order has been placed!!");
-            } else {
-                return redirect()->route('shopping.cart')->with("success", "Your order has not been placed!!");
-            }
-        } else {
-            return redirect()->route('cake.login')->with("error", "Please login to add this in your cart!!");
-        }
+    //payment method stripe
+    public function paymentStripe(Request $request){
+        $all_products = DB::table('products')->join("carts", "carts.productId", "products.id")->select("products.title", "products.image", 'products.price', 'carts.quantites as cQuantites', "carts.customerId", 'carts.*')->where("customerId", Auth::user()->id)->get();
+        $lineItems=[];
+        //dd($all_products);
+        //$total_price = 0;
+        foreach($all_products as $product){
+            $total_cost = $product->price * $product->cQuantites; 
+            $total_price = $total_cost + 60; 
+            $lineItems[] = [
+        
+            'price_data' => [
+                'currency' => 'usd',
+                'product_data' => [
+                'name' => $product->title,
+                'images' => [$product->image]
+                ],
+                'unit_amount' => $total_price *100,
+            ],
+            'quantity' => 1,
+        ];
+        };
+        $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
+        $checkout_session = $stripe->checkout->sessions->create([
+            'line_items' => $lineItems,
+            'mode' => 'payment',
+            "customer_creation" => 'always',
+            'success_url' => route('success').'?checkout_session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => route('cancel'),
+          ]);
+    
+        $order = new Order;
+        $order->status= "unpaid";
+        $order->bill = $total_price;
+        $order->fullname = $request->name;
+        $order->customerId = Auth::user()->id;
+        $order->cell_number = $request->cell;
+        $order->address = $request->address;
+        $order->session_id = $checkout_session->id;
+        $order->save();
+    
+          return redirect($checkout_session->url);
+    
     }
+    
+
+    public function success(Request $request){
+        $stripe = new \Stripe\StripeClient(env("STRIPE_SECRET"));
+
+        try{
+
+            $checkout_session_id = $request->get("checkout_session_id");
+            $session = $stripe->checkout->sessions->retrieve($checkout_session_id);
+            if(!$session){
+                throw new NotFoundHttpException;
+            }
+            $customer = $stripe->customers->retrieve($session->customer);
+            $order = Order::where("session_id", $checkout_session_id)->first();
+            
+            if(!$order){
+                throw new NotFoundHttpException;
+            }
+            if($order->status=="unpaid"){
+                $order->status = "paid";
+                //for mail get email like this ($customer->email).
+                $order->$customer->email;
+                $order->save();              
+            }
+                      
+            $carts = Cart::where("customerId", Auth::user()->id)->get();
+            foreach($carts as $item){
+                $products = Product::find($item->productId);
+                $orderItem = new OrderItem;
+                $orderItem->productId = $item->productId;
+                $orderItem->quantites = $item->quantites;
+                $orderItem->price = $products->price;
+                $orderItem->orderId = $order->id;
+                $orderItem->save();
+                $item->delete();
+            }    
+            
+            $msg = "Product Pay Successfull";
+            return view("success", compact("msg")); 
+ 
+
+        }catch(\Exception $e){
+            throw new NotFoundHttpException;
+        } 
+
+    }
+
+    public function cancel(){
+
+    }
+
+
+
+    public function webhook(){
+
+        // This is your Stripe CLI webhook secret for testing your endpoint locally.
+        $endpoint_secret = env("STRIPE_WEBHOOK_KEY");
+
+        $payload = @file_get_contents('php://input');
+        $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+        $event = null;
+
+        try {
+        $event = \Stripe\Webhook::constructEvent(
+            $payload, $sig_header, $endpoint_secret
+        );
+        } catch(\UnexpectedValueException $e) {
+        // Invalid payload
+            return response('', 400);
+        } catch(\Stripe\Exception\SignatureVerificationException $e) {
+        // Invalid signature
+        return response('', 400);
+        }
+
+        // Handle the event
+        switch ($event->type) {
+        case 'checkout.session.completed':
+            $session = $event->data->object;
+            $sessionId = $session->id;
+            $order = Order::where("session_id", $sessionId)->first();
+            if($order && $order->status==="unpaid"){
+                $order->status = "paid";
+                $order->save();
+                //send mail
+            }
+
+        // ... handle other event types
+        default:
+            echo 'Received unknown event type ' . $event->type;
+        }
+
+        return response('');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -597,11 +678,13 @@ class CakeController extends Controller
 
         //single post method
         public function singlePost($id){
-            $single_post = Post::find($id);
-            $user_infos = DB::table("users")->join("comments", "comments.user_id", "=", "users.id")->select("users.id", "users.name", "users.image", "users.type")->get();
-            $show_comments = Comment::all();
-
-            return view('single_post', compact("single_post", "user_infos", "show_comments"));
+           
+                $single_post = Post::find($id);
+                $user_infos = DB::table("users")->join("comments", "comments.user_id", "users.id")->select("users.id", "users.name", "users.image", "users.type")->get();
+                $show_comments = Comment::all();
+    
+                return view('single_post', compact("single_post", "user_infos", "show_comments"));
+         
         }
 
         //upload comment method
@@ -619,9 +702,11 @@ class CakeController extends Controller
 
         //delete comment.
         public function deleteComment($id){
-            $delete_comment = Comment::find($id);
-            $delete_comment->delete();            
-            return redirect()->back();
+            if(Auth::user()->id){
+                $delete_comment = Comment::find($id);
+                $delete_comment->delete();            
+                return redirect()->back();
+            }
         }
 
 
@@ -701,9 +786,34 @@ class CakeController extends Controller
 
 
 
-    
-
-
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+                    //mail information array
+                    // $payment_receipt = [
+                    //     "orderStatus" => "Paid",
+                    //     "CustomerId" => Auth::user()->id,
+                    //     "Bill" => $request->bill,
+                    //     "fullname" => $request->name,
+                    //     "cellNumber" => $request->cell,
+                    //     "email" => $request->email,
+                    //     "address" => $request->address,
+                    //     "cart" => $carts = Cart::where("customerId", Auth::user()->id)->get(),
+                    //     "products" => DB::table('carts')->join('products',"carts.productId", '=', 'products.id')->select("products.title", "products.description", "products.price"),
+                        
+                        
+                    // ];
+
+                    // Mail::to($request->email)->send(new OrderConfirmMail($payment_receipt));

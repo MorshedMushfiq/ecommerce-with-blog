@@ -42,16 +42,21 @@
                         
                         <div class="second py-2 px-2 mb-1"> <span class="text1">
                             <div class="d-flex flex-column justify-content-start ml-2 mb-3"><span class="d-block font-weight-bold name">{{$user->name}}</span><span class="date text-black-50">Shared publicly - {{$all_comments->created_at}}</span></div>
-                            @endif
-                            @endforeach
+                        @endif
+                        @endforeach
                             {{$all_comments->comment}}
                             
                         </span>
                         </div>
                     </div>
-                    @if($user->type=="Admin" &&$user->id==$all_comments->user_id)
+                 
+                    @if($all_comments->user_id==$user->id && Auth::user()->type=="Admin")
+                    @php
+                        dd($user);
+                    @endphp
                     <a class='text-underline text-danger' href="{{route('delete.comment', $all_comments->id)}}">Delete comment</a>
                     @endif
+                 
                 </div>
 
                 @endif
