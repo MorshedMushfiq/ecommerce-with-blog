@@ -202,20 +202,26 @@ class CakeController extends Controller
 
             $checkout_session_id = $request->get("checkout_session_id");
             $session = $stripe->checkout->sessions->retrieve($checkout_session_id);
+
+            
             if(!$session){
-                throw new NotFoundHttpException;
+                return "session e somossha ase";
             }
             $customer = $stripe->customers->retrieve($session->customer);
             $order = Order::where("session_id", $checkout_session_id)->first();
+            // dd($customer);
             
             if(!$order){
-                throw new NotFoundHttpException;
+                return "order e somossha ase";
             }
             if($order->status=="unpaid"){
                 $order->status = "paid";
                 //for mail get email like this ($customer->email).
-                $order->$customer->email;
-                $order->save();              
+                $order->email = $customer->email;
+                $order->save();         
+                    
+            }else{
+                return "order paid hoitase na"; 
             }
                       
             $carts = Cart::where("customerId", Auth::user()->id)->get();
@@ -235,7 +241,7 @@ class CakeController extends Controller
  
 
         }catch(\Exception $e){
-            throw new NotFoundHttpException;
+            return "kichu ekta prblm ase vai naile e te ashar kotha nai";
         } 
 
     }
