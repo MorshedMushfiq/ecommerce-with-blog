@@ -22,8 +22,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Test\Constraint\ResponseIsRedirected;
+
+use function PHPUnit\Framework\throwException;
 
 class CakeController extends Controller
 {
@@ -220,9 +223,11 @@ class CakeController extends Controller
                 $order->email = $customer->email;
                 $order->save();         
                     
-            }else{
-                return "order paid hoitase na"; 
             }
+            
+            //else{
+            //     return "order paid hoitase na"; 
+            // }
                       
             $carts = Cart::where("customerId", Auth::user()->id)->get();
             foreach($carts as $item){
@@ -241,7 +246,8 @@ class CakeController extends Controller
  
 
         }catch(\Exception $e){
-            return "kichu ekta prblm ase vai naile e te ashar kotha nai";
+            //return "kichu ekta prblm ase vai naile e te ashar kotha nai";
+            throw new NotFoundHttpException;
         } 
 
     }
@@ -352,7 +358,7 @@ class CakeController extends Controller
         if ($request->hasFile('file')) {
             $img = $request->file('file');
             $unique_name = md5(time() . rand() . "." . $img->getClientOriginalExtension());
-            $img->move(public_path("uploads/profiles"), $unique_name);
+            $img->storeAs("public/uploads/profiles", $unique_name);
         }
         //for register in database
         $user = User::find(Auth::user()->id);
@@ -397,7 +403,7 @@ class CakeController extends Controller
         if ($request->hasFile('file')) {
             $img = $request->file('file');
             $unique_name = md5(time() . rand() . "." . $img->getClientOriginalExtension());
-            $img->move(public_path("uploads/profiles"), $unique_name);
+            $img->storeAs("public/uploads/profiles", $unique_name);
         }
         //for register in database
         $user = new User;
@@ -467,7 +473,7 @@ class CakeController extends Controller
         //         return redirect()->route("cake.index");  
         //     }elseif($user->type=="Admin"){
         //     //if type of a man is admin  
-        //     return redirect()->route("admin.dashboard"); 
+        //    return redirect()->route("admin.dashboard"); 
 
         //     }
         // }else{
@@ -630,7 +636,7 @@ class CakeController extends Controller
              if($request->hasFile('post_image')){
                 $img = $request->file('post_image');
                 $unique_name= md5(time().rand()). "." . $img->getClientOriginalExtension();
-                $img->move(public_path("uploads/posts"), $unique_name);
+                $img->storeAs("public/uploads/posts", $unique_name);
             }
     
             $post = new Post;
@@ -654,7 +660,7 @@ class CakeController extends Controller
                 if($request->hasFile('post_image')){
                     $img = $request->file('post_image');
                     $unique_name = md5(time().rand().".". $img->getClientOriginalExtension());
-                    $img->move(public_path("uploads/posts"), $unique_name);
+                    $img->storeAs("public/uploads/posts", $unique_name);
                 }
         
                 $post = Post::find($request->id);

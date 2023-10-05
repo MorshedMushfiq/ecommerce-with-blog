@@ -86,7 +86,7 @@
                         @endphp
                             <td>{{$i}}</td>
                           <td>{{$team->name}}</td>
-                          <td><img src="{{URL::asset('uploads/teams/'.$team->image)}}" alt=""></td>
+                          <td><img src="{{URL::asset('/storage/uploads/teams/'.$team->image)}}" alt=""></td>
                           <td class="font-weight-bold">{{$team->cell}}</td>
                           <td class="font-weight-medium"><div class="badge badge-warning">{{$team->role}}</div></td>
                           <td>

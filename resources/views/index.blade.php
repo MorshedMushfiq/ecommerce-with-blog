@@ -103,7 +103,7 @@
                                     <div class="bg-white p-2">
                                         @foreach ($user_info->unique() as $user)
                                         @if($posts->user_id==$user->id)
-                                        <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{{URL::asset('uploads/profiles/'. $user->image)}}" width="40">
+                                        <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{{URL::asset('/storage/uploads/profiles/'. $user->image)}}" width="40">
                                             <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name">{{$user->name}}</span><span class="date text-black-50">Shared publicly - {{$posts->created_at}}</span></div>
                                         </div>
                                         @endif
@@ -209,7 +209,7 @@
                                         <div class="col-lg-6 tab-pane fade show p-0 active {{$products->type}}">
                                             <div class="d-flex h-100">
                                                 <div class="flex-shrink-0">
-                                                    <img class="img-fluid" src="{{URL::asset('uploads/products/'. $products->image)}}" alt="" style="width: 150px; height: 85px;">
+                                                    <img class="img-fluid" src="{{URL::asset('/storage/uploads/products/'. $products->image)}}" alt="" style="width: 150px; height: 85px;">
                                                     <h4 class="bg-dark text-primary p-2 m-0"><a href="{{route('cake.cart', $products->id)}}">${{$products->price}}</a></h4>
                                                 </div>
                                                 <div class="d-flex flex-column justify-content-center text-start bg-secondary border-inner px-4">
@@ -276,7 +276,7 @@
                                 <div class="col-lg-4 col-md-6">
                                     <div class="team-item">
                                         <div class="position-relative overflow-hidden">
-                                            <img class="img-fluid w-100" src="{{URL::to('uploads/teams/' . $team->image)}}" alt="">
+                                            <img class="img-fluid w-100" src="{{URL::to('/storage/uploads/teams/' . $team->image)}}" alt="">
                                             <div class="team-overlay w-100 h-100 position-absolute top-50 start-50 translate-middle d-flex align-items-center justify-content-center">
                                                 <div class="d-flex align-items-center justify-content-start">
                                                     <a class="btn btn-lg btn-primary btn-lg-square border-inner rounded-0 mx-1" href="#"><i class="fab fa-twitter fw-normal"></i></a>

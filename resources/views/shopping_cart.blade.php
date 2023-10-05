@@ -36,7 +36,7 @@
                   </td>
                   <th scope="row">
                     <div class="d-flex align-items-center">
-                      <img src="{{URL::asset('uploads/products/'. $cart->image)}}" class="img-fluid rounded-3"
+                      <img src="{{URL::asset('/storage/uploads/products/'. $cart->image)}}" class="img-fluid rounded-3"
                         style="width: 120px;" alt="Book">
                       <div class="flex-column ms-4">
                         <p>{{$cart->title}}</p>
