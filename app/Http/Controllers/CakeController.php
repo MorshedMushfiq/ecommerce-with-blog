@@ -358,7 +358,7 @@ class CakeController extends Controller
         if ($request->hasFile('file')) {
             $img = $request->file('file');
             $unique_name = md5(time() . rand() . "." . $img->getClientOriginalExtension());
-            $img->storeAs("public/uploads/profiles", $unique_name);
+            $img->move(public_path("uploads/profiles"), $unique_name);
         }
         //for register in database
         $user = User::find(Auth::user()->id);
@@ -403,7 +403,7 @@ class CakeController extends Controller
         if ($request->hasFile('file')) {
             $img = $request->file('file');
             $unique_name = md5(time() . rand() . "." . $img->getClientOriginalExtension());
-            $img->storeAs("public/uploads/profiles", $unique_name);
+            $img->move(public_path("uploads/profiles"), $unique_name);
         }
         //for register in database
         $user = new User;
@@ -636,7 +636,7 @@ class CakeController extends Controller
              if($request->hasFile('post_image')){
                 $img = $request->file('post_image');
                 $unique_name= md5(time().rand()). "." . $img->getClientOriginalExtension();
-                $img->storeAs("public/uploads/posts", $unique_name);
+                $img->move(public_path("uploads/posts"), $unique_name);
             }
     
             $post = new Post;
@@ -660,7 +660,7 @@ class CakeController extends Controller
                 if($request->hasFile('post_image')){
                     $img = $request->file('post_image');
                     $unique_name = md5(time().rand().".". $img->getClientOriginalExtension());
-                    $img->storeAs("public/uploads/posts", $unique_name);
+                    $img->move(public_path("uploads/posts"), $unique_name);
                 }
         
                 $post = Post::find($request->id);

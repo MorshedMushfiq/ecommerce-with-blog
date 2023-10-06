@@ -37,7 +37,7 @@
                         <tr>
                           <td>{{$i}}</td>
                           <td>{{$trash_team->name}}</td>
-                          <td><img src="{{URL::asset('/storage/uploads/teams/'.$trash_team->image)}}" alt=""></td>
+                          <td><img src="{{URL::asset('uploads/teams/'.$trash_team->image)}}" alt=""></td>
                           <td class="font-weight-bold">${{$trash_team->role}}</td>
                           <td class="font-weight-medium">{{$trash_team->cell}}<td>
                             <a href="{{route('team.restore', $trash_team->id)}}" class='btn btn-warning btn-sm'>Restore</a>

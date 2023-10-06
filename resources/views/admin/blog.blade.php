@@ -91,7 +91,7 @@
                               <td>1</td>
                               <td>{{$post->title}}</td>
                               <td style='width: 100%;'><p>{{$post->post_description}}</p></td>
-                              <td><img src="{{URL::asset('/storage/uploads/posts/'. $post->post_image)}}" alt=""></td>
+                              <td><img src="{{URL::asset('uploads/posts/'. $post->post_image)}}" alt=""></td>
                               <td>{{$post->post_comment}}</td>
                               <td class="font-weight-bold">{{$post->post_tags}}</td>
                               <td>{{$post->created_at}}</td>
